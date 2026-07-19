@@ -1,0 +1,634 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quantum-algorithm-designer:schema:qadl:0.1",
+  "title": "Quantum Algorithm Design Language IR 0.1",
+  "description": "A project-local intermediate representation for algorithm contracts, not a proof calculus.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "qadl_version",
+    "candidate_id",
+    "problem",
+    "algorithm",
+    "resources",
+    "proof_obligations",
+    "claim",
+    "provenance"
+  ],
+  "properties": {
+    "qadl_version": {
+      "const": "0.1"
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "problem": {
+      "$ref": "#/$defs/problem"
+    },
+    "algorithm": {
+      "$ref": "#/$defs/algorithm"
+    },
+    "resources": {
+      "$ref": "#/$defs/resources"
+    },
+    "proof_obligations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proofObligation"
+      }
+    },
+    "claim": {
+      "$ref": "#/$defs/claim"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    }
+  },
+  "$defs": {
+    "expression": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Python-style arithmetic over declared size parameters, or the literal unknown."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "status"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "source_supported",
+            "model_inference",
+            "uncertain",
+            "needs_human_check"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "sizeParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "domain"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "domain": {
+          "enum": [
+            "positive-integer",
+            "nonnegative-integer",
+            "positive-real",
+            "probability"
+          ]
+        },
+        "lower_bound": {
+          "type": "number"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "problem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "task",
+        "instance_distribution",
+        "size_parameters",
+        "promises",
+        "input",
+        "output",
+        "classical_baselines"
+      ],
+      "properties": {
+        "family": {
+          "enum": [
+            "decision",
+            "function",
+            "search",
+            "sampling",
+            "estimation",
+            "optimization",
+            "linear-algebra",
+            "simulation",
+            "learning",
+            "other"
+          ]
+        },
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instance_distribution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sizeParameter"
+          }
+        },
+        "promises": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "representation",
+            "access_model",
+            "preparation_cost",
+            "oracle_construction_cost",
+            "assumptions"
+          ],
+          "properties": {
+            "representation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "access_model": {
+              "enum": [
+                "explicit",
+                "stream",
+                "sample-query",
+                "black-box-oracle",
+                "sparse-oracle",
+                "qram",
+                "quantum-state",
+                "hamiltonian",
+                "block-encoding"
+              ]
+            },
+            "preparation_cost": {
+              "$ref": "#/$defs/expression"
+            },
+            "oracle_construction_cost": {
+              "$ref": "#/$defs/expression"
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "representation",
+            "contract",
+            "accuracy",
+            "success_probability",
+            "readout_cost"
+          ],
+          "properties": {
+            "representation": {
+              "enum": [
+                "bit",
+                "scalar",
+                "classical-vector",
+                "sample",
+                "distribution",
+                "certificate",
+                "expectation",
+                "quantum-state",
+                "other"
+              ]
+            },
+            "contract": {
+              "type": "string",
+              "minLength": 1
+            },
+            "accuracy": {
+              "$ref": "#/$defs/expression"
+            },
+            "success_probability": {
+              "$ref": "#/$defs/expression"
+            },
+            "readout_cost": {
+              "$ref": "#/$defs/expression"
+            }
+          }
+        },
+        "classical_baselines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/baseline"
+          }
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "algorithm_class",
+        "access_model",
+        "output_contract",
+        "resources",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "algorithm_class": {
+          "type": "string"
+        },
+        "access_model": {
+          "type": "string"
+        },
+        "output_contract": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      }
+    },
+    "stageContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "precondition",
+        "postcondition"
+      ],
+      "properties": {
+        "precondition": {
+          "type": "string"
+        },
+        "postcondition": {
+          "type": "string"
+        },
+        "invariant": {
+          "type": "string"
+        },
+        "failure_condition": {
+          "type": "string"
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "domain",
+        "operation",
+        "depends_on",
+        "repetitions",
+        "resources",
+        "contract"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "domain": {
+          "enum": [
+            "classical",
+            "quantum",
+            "measurement",
+            "control",
+            "io"
+          ]
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primitive": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "repetitions": {
+          "$ref": "#/$defs/expression"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "contract": {
+          "$ref": "#/$defs/stageContract"
+        }
+      }
+    },
+    "algorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "stages",
+        "correctness_contract"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "query",
+            "circuit",
+            "measurement-based",
+            "adiabatic",
+            "analog",
+            "hybrid"
+          ]
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/stage"
+          }
+        },
+        "correctness_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "precondition",
+            "postcondition",
+            "failure_probability"
+          ],
+          "properties": {
+            "precondition": {
+              "type": "string"
+            },
+            "postcondition": {
+              "type": "string"
+            },
+            "failure_probability": {
+              "$ref": "#/$defs/expression"
+            },
+            "loop_invariants": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "expressions",
+        "error_budget",
+        "assumptions"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "query",
+            "logical-circuit",
+            "fault-tolerant",
+            "end-to-end"
+          ]
+        },
+        "expressions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "error_budget": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "proofObligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "statement",
+        "status",
+        "method",
+        "artifacts"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "kind": {
+          "enum": [
+            "correctness",
+            "resource",
+            "advantage",
+            "access",
+            "implementation",
+            "robustness",
+            "reproducibility"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "open",
+            "tested",
+            "proof-sketch",
+            "proved",
+            "formally-verified",
+            "refuted"
+          ]
+        },
+        "method": {
+          "type": "string"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "status",
+        "scope",
+        "baseline_id",
+        "statement",
+        "evidence",
+        "caveats"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "none",
+            "query-advantage",
+            "logical-resource-advantage",
+            "physical-resource-advantage",
+            "limited-speedup",
+            "potential-speedup",
+            "strong-speedup",
+            "provable-speedup",
+            "end-to-end-practical-advantage"
+          ]
+        },
+        "status": {
+          "enum": [
+            "not-claimed",
+            "hypothesis",
+            "empirically-observed",
+            "proof-sketch",
+            "formally-verified",
+            "refuted"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "none",
+            "query",
+            "logical",
+            "physical",
+            "kernel-wall-clock",
+            "end-to-end-wall-clock",
+            "space",
+            "sample"
+          ]
+        },
+        "baseline_id": {
+          "type": "string"
+        },
+        "statement": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "caveats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generated_by",
+        "created_at",
+        "random_seed",
+        "parent_ids",
+        "sources"
+      ],
+      "properties": {
+        "generated_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "random_seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    }
+  }
+}

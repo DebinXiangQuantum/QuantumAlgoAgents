@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frame Quantum Problem"
+  short_description: "Specify access, outputs, costs, and baselines"
+  default_prompt: "Use $frame-quantum-problem to turn this problem into a testable quantum design contract."

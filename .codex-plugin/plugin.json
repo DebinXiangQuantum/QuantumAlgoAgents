@@ -1,0 +1,43 @@
+{
+  "name": "quantum-algorithm-designer",
+  "version": "0.1.1",
+  "description": "Evidence-gated agentic design, formalization, search, verification, and audit of quantum and hybrid algorithms.",
+  "author": {
+    "name": "DebinXiangQuantum",
+    "url": "https://github.com/DebinXiangQuantum"
+  },
+  "homepage": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents#readme",
+  "repository": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents",
+  "keywords": [
+    "quantum-algorithms",
+    "formal-methods",
+    "hybrid-computing",
+    "reinforcement-learning",
+    "resource-estimation"
+  ],
+  "license": "Apache-2.0",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Quantum Algorithm Designer",
+    "shortDescription": "Design and audit evidence-gated quantum algorithms.",
+    "longDescription": "An evidence-gated workflow for designing quantum and quantum-classical algorithms. It frames matched problem contracts, selects theorem-backed primitives, builds hybrid DAGs, emits QADL-IR 0.1 proof obligations, searches finite typed spaces with seeded random or evolutionary methods and optional PPO, and audits resource and advantage claims against classical baselines. Outputs are candidates for expert review, never automatic proofs or quantum-advantage certificates.",
+    "developerName": "DebinXiangQuantum",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "brandColor": "#008F79",
+    "composerIcon": "./assets/brand/composer-icon.png",
+    "logo": "./assets/brand/logo.png",
+    "logoDark": "./assets/brand/logo-dark.png",
+    "websiteURL": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents",
+    "defaultPrompt": [
+      "Design evidence-gated quantum and hybrid candidates.",
+      "Search this typed QADL space under explicit constraints.",
+      "Audit this speedup against matched classical baselines."
+    ]
+  }
+}

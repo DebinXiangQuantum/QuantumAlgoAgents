@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "quantum-algorithm-designer": {
+      "command": "python3",
+      "args": [
+        "scripts/mcp_server.py"
+      ],
+      "cwd": ".",
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1"
+      }
+    }
+  }
+}

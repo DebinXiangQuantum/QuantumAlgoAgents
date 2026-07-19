@@ -1,0 +1,218 @@
+{
+  "qadl_version": "0.1",
+  "candidate_id": "grover-oracle-search",
+  "title": "Black-box unstructured search with amplitude amplification",
+  "tags": [
+    "amplitude-amplification",
+    "query-model"
+  ],
+  "problem": {
+    "family": "search",
+    "task": "Find a marked item among N items under a unique-solution promise.",
+    "instance_distribution": "All black-box predicates with exactly one marked input.",
+    "size_parameters": [
+      {
+        "name": "N",
+        "domain": "positive-integer",
+        "lower_bound": 4,
+        "description": "Search-space cardinality."
+      }
+    ],
+    "promises": [
+      "N is a power of two.",
+      "N is at least four.",
+      "Exactly one input is marked."
+    ],
+    "input": {
+      "representation": "Coherent phase oracle for a Boolean predicate over log2(N) qubits.",
+      "access_model": "black-box-oracle",
+      "preparation_cost": "1",
+      "oracle_construction_cost": "unknown",
+      "assumptions": [
+        "The phase oracle and its inverse are available coherently."
+      ]
+    },
+    "output": {
+      "representation": "classical-vector",
+      "contract": "Return the unique marked index.",
+      "accuracy": "0",
+      "success_probability": "2 / 3",
+      "readout_cost": "1"
+    },
+    "classical_baselines": [
+      {
+        "id": "randomized-black-box-scan",
+        "name": "Randomized black-box search",
+        "algorithm_class": "randomized query algorithm",
+        "access_model": "black-box-oracle",
+        "output_contract": "Return the unique marked index.",
+        "resources": {
+          "queries": "N"
+        },
+        "source": {
+          "url": "https://doi.org/10.1145/237814.237866",
+          "title": "Strengths and weaknesses of quantum computing",
+          "status": "source_supported",
+          "note": "Provides the oracle-model lower-bound context for unordered search."
+        }
+      }
+    ]
+  },
+  "algorithm": {
+    "model": "query",
+    "stages": [
+      {
+        "id": "prepare",
+        "domain": "quantum",
+        "operation": "Prepare a uniform superposition.",
+        "primitive": "uniform-state-preparation",
+        "depends_on": [],
+        "repetitions": "1",
+        "resources": {
+          "logical_qubits": "ceil(log2(N))"
+        },
+        "contract": {
+          "precondition": "N is a power of two",
+          "postcondition": "The data register is uniform over all N indices"
+        }
+      },
+      {
+        "id": "amplify",
+        "domain": "quantum",
+        "operation": "Alternate the phase oracle and diffusion reflection.",
+        "primitive": "amplitude-amplification",
+        "depends_on": [
+          "prepare"
+        ],
+        "repetitions": "floor(pi / (4 * asin(1 / sqrt(N))))",
+        "resources": {
+          "oracle_calls": "floor(pi / (4 * asin(1 / sqrt(N))))",
+          "logical_qubits": "ceil(log2(N)) + 1"
+        },
+        "contract": {
+          "precondition": "Exactly one basis state is marked",
+          "postcondition": "The marked-state measurement probability is at least 2/3"
+        }
+      },
+      {
+        "id": "measure",
+        "domain": "measurement",
+        "operation": "Measure the data register and return its index.",
+        "depends_on": [
+          "amplify"
+        ],
+        "repetitions": "1",
+        "resources": {
+          "measurements": "ceil(log2(N))"
+        },
+        "contract": {
+          "precondition": "The marked-state probability is at least 2/3",
+          "postcondition": "The returned index is marked with probability at least 2/3"
+        }
+      }
+    ],
+    "correctness_contract": {
+      "precondition": "The promises and black-box access contract hold.",
+      "postcondition": "The unique marked index is returned.",
+      "failure_probability": "1 / 3",
+      "loop_invariants": [
+        "The state remains in the two-dimensional good/bad subspace."
+      ]
+    }
+  },
+  "resources": {
+    "model": "query",
+    "expressions": {
+      "queries": "floor(pi / (4 * asin(1 / sqrt(N))))",
+      "logical_qubits": "ceil(log2(N)) + 1",
+      "t_depth": "4 * ceil(sqrt(N))",
+      "input_preparation": "1",
+      "readout": "1"
+    },
+    "error_budget": {
+      "algorithmic_failure": "1 / 3"
+    },
+    "assumptions": [
+      "Resource expressions are query-level estimates, not fault-tolerant costs."
+    ]
+  },
+  "proof_obligations": [
+    {
+      "id": "po-correctness",
+      "kind": "correctness",
+      "statement": "Amplitude amplification rotates the initial state to marked overlap at least 2/3.",
+      "status": "proof-sketch",
+      "method": "Two-dimensional rotation argument.",
+      "artifacts": [
+        "https://doi.org/10.1090/conm/305/05215"
+      ]
+    },
+    {
+      "id": "po-resource",
+      "kind": "resource",
+      "statement": "The algorithm uses O(sqrt(N)) oracle queries.",
+      "status": "proof-sketch",
+      "method": "Count amplification iterations.",
+      "artifacts": [
+        "https://doi.org/10.1090/conm/305/05215"
+      ]
+    },
+    {
+      "id": "po-advantage",
+      "kind": "advantage",
+      "statement": "The quantum query upper bound is quadratically below the randomized query lower bound.",
+      "status": "proof-sketch",
+      "method": "Compare matched black-box query models.",
+      "artifacts": [
+        "https://doi.org/10.1145/237814.237866"
+      ]
+    },
+    {
+      "id": "po-oracle",
+      "kind": "access",
+      "statement": "Construct and cost the coherent oracle for a concrete application.",
+      "status": "open",
+      "method": "Reversible implementation and resource estimation.",
+      "artifacts": []
+    }
+  ],
+  "claim": {
+    "type": "query-advantage",
+    "status": "proof-sketch",
+    "scope": "query",
+    "baseline_id": "randomized-black-box-scan",
+    "statement": "Conditional on black-box oracle access, the candidate has a quadratic query advantage.",
+    "evidence": [
+      {
+        "url": "https://doi.org/10.1090/conm/305/05215",
+        "title": "Quantum amplitude amplification and estimation",
+        "status": "source_supported",
+        "note": "Supports the amplitude-amplification query upper bound."
+      },
+      {
+        "url": "https://doi.org/10.1145/237814.237866",
+        "title": "Strengths and weaknesses of quantum computing",
+        "status": "source_supported",
+        "note": "Supports the unordered-search lower-bound context."
+      }
+    ],
+    "caveats": [
+      "This does not establish a gate-level, fault-tolerant, or end-to-end speedup.",
+      "A concrete oracle may erase the query advantage after construction costs are included."
+    ]
+  },
+  "provenance": {
+    "generated_by": "quantum-algorithm-designer example",
+    "created_at": "2026-07-18T16:00:00+08:00",
+    "random_seed": null,
+    "parent_ids": [],
+    "sources": [
+      {
+        "url": "https://doi.org/10.1090/conm/305/05215",
+        "title": "Quantum amplitude amplification and estimation",
+        "status": "source_supported",
+        "note": "Algorithm source."
+      }
+    ]
+  }
+}

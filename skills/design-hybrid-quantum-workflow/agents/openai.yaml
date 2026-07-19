@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Hybrid Quantum Workflow"
+  short_description: "Partition and couple classical and quantum stages"
+  default_prompt: "Use $design-hybrid-quantum-workflow to design a defensible quantum-classical decomposition."

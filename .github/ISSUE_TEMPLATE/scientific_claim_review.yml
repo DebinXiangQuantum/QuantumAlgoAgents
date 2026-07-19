@@ -1,0 +1,57 @@
+name: Scientific claim review
+description: Challenge or review a correctness, complexity, novelty, resource, or advantage claim.
+title: "[Claim review]: "
+body:
+  - type: dropdown
+    id: claim_type
+    attributes:
+      label: Claim type
+      options:
+        - Correctness
+        - Complexity or resource bound
+        - Query advantage
+        - Logical-circuit advantage
+        - Fault-tolerant advantage
+        - Kernel wall-clock advantage
+        - End-to-end advantage
+        - Novelty
+        - Reproducibility
+    validations:
+      required: true
+  - type: textarea
+    id: exact_claim
+    attributes:
+      label: Exact claim under review
+      description: Quote or link the precise project statement, candidate ID, and version.
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Problem and comparison contract
+      description: State promises, access, output, accuracy, success probability, and baseline.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or counterexample
+      description: Prefer primary sources and public, reproducible artifacts.
+    validations:
+      required: true
+  - type: textarea
+    id: requested_change
+    attributes:
+      label: Requested disposition
+      description: For example narrow, block, mark uncertain, mark refuted, or add an obligation.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I read docs/SCIENTIFIC_CLAIMS.md.
+          required: true
+        - label: I separated assumptions from supported conclusions.
+          required: true

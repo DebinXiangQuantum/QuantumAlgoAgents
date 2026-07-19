@@ -1,0 +1,4 @@
+interface:
+  display_name: "Select Quantum Primitives"
+  short_description: "Match bottlenecks to proven quantum primitives"
+  default_prompt: "Use $select-quantum-primitives to identify justified quantum building blocks for this problem."

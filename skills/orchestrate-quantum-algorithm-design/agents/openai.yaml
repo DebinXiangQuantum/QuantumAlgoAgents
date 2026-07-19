@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestrate Quantum Algorithm Design"
+  short_description: "Coordinate rigorous quantum algorithm design"
+  default_prompt: "Use $orchestrate-quantum-algorithm-design to run an end-to-end design workflow."

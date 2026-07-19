@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Quantum Advantage"
+  short_description: "Challenge speedup claims against fair baselines"
+  default_prompt: "Use $audit-quantum-advantage to audit this quantum speedup claim end to end."

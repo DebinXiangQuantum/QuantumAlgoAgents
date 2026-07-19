@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this research software, cite the version you evaluated and preserve its assumptions and evidence status."
+title: "Quantum Algorithm Designer"
+type: software
+authors:
+  - name: "DebinXiangQuantum"
+version: 0.1.1
+license: Apache-2.0
+repository-code: "https://github.com/DebinXiangQuantum/QuantumAlgoAgents"
+url: "https://github.com/DebinXiangQuantum/QuantumAlgoAgents"
+abstract: >-
+  An evidence-gated Codex plugin and deterministic toolkit for agent-guided
+  design, formalization, finite search, verification, and audit of quantum
+  and quantum-classical algorithm candidates.
+keywords:
+  - quantum algorithms
+  - formal methods
+  - hybrid quantum-classical computing
+  - reinforcement learning
+  - resource estimation

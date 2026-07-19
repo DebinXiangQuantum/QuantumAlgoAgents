@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose a focused capability, integration, or workflow improvement.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the research or user problem, not only the desired implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Define inputs, outputs, failure behavior, and evidence boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: compatibility
+    attributes:
+      label: Contract impact
+      options:
+        - No QADL or public interface change
+        - Backward-compatible extension
+        - Potential breaking change
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: science
+    attributes:
+      label: Scientific basis and limits
+      description: Link primary sources and identify any claim, proof, or resource implications.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I have not presented search or simulation output as proof.
+          required: true
+        - label: I searched existing issues and roadmap discussions.
+          required: true

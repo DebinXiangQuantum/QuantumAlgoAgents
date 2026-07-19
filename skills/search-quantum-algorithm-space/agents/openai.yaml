@@ -1,0 +1,4 @@
+interface:
+  display_name: "Search Quantum Algorithm Space"
+  short_description: "Run reproducible candidate search and archiving"
+  default_prompt: "Use $search-quantum-algorithm-space to configure and run a reproducible candidate search."

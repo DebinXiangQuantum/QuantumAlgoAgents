@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quantum-algorithm-designer:schema:search-space:0.1",
+  "title": "QADL Search Space 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "search_space_version",
+    "base_candidate",
+    "choices",
+    "evaluation"
+  ],
+  "properties": {
+    "search_space_version": {
+      "const": "0.1"
+    },
+    "base_candidate": {
+      "type": "object"
+    },
+    "choices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "values"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "values": {
+            "type": "array",
+            "minItems": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parameter_points",
+        "objectives",
+        "hard_constraints"
+      ],
+      "properties": {
+        "parameter_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "metric",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "metric": {
+                "type": "string"
+              },
+              "direction": {
+                "enum": [
+                  "minimize",
+                  "maximize"
+                ]
+              },
+              "weight": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "hard_constraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "metric",
+              "op",
+              "value"
+            ],
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "op": {
+                "enum": [
+                  "==",
+                  "<=",
+                  ">=",
+                  "<",
+                  ">"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Formalize Quantum Algorithm"
+  short_description: "Write QADL contracts and proof obligations"
+  default_prompt: "Use $formalize-quantum-algorithm to formalize this candidate and its resource claims."

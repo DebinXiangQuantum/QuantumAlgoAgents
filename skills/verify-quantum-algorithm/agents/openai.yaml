@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify Quantum Algorithm"
+  short_description: "Test semantics, resources, and proof obligations"
+  default_prompt: "Use $verify-quantum-algorithm to verify this candidate at the appropriate evidence level."

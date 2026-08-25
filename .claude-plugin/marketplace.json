@@ -1,0 +1,30 @@
+{
+  "name": "quantum-algo-agents",
+  "owner": {
+    "name": "DebinXiangQuantum",
+    "url": "https://github.com/DebinXiangQuantum"
+  },
+  "plugins": [
+    {
+      "name": "quantum-algorithm-designer",
+      "source": "./",
+      "description": "Evidence-gated agentic design, formalization, search, verification, and audit of quantum and hybrid algorithms.",
+      "version": "0.1.1",
+      "author": {
+        "name": "DebinXiangQuantum",
+        "url": "https://github.com/DebinXiangQuantum"
+      },
+      "homepage": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents#readme",
+      "repository": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents",
+      "license": "Apache-2.0",
+      "keywords": [
+        "quantum-algorithms",
+        "formal-methods",
+        "hybrid-computing",
+        "reinforcement-learning",
+        "resource-estimation"
+      ],
+      "category": "developer-tools"
+    }
+  ]
+}

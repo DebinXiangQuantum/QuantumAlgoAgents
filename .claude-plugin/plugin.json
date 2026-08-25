@@ -1,0 +1,21 @@
+{
+  "name": "quantum-algorithm-designer",
+  "version": "0.1.1",
+  "description": "Evidence-gated agentic design, formalization, search, verification, and audit of quantum and hybrid algorithms.",
+  "author": {
+    "name": "DebinXiangQuantum",
+    "url": "https://github.com/DebinXiangQuantum"
+  },
+  "homepage": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents#readme",
+  "repository": "https://github.com/DebinXiangQuantum/QuantumAlgoAgents",
+  "keywords": [
+    "quantum-algorithms",
+    "formal-methods",
+    "hybrid-computing",
+    "reinforcement-learning",
+    "resource-estimation"
+  ],
+  "license": "Apache-2.0",
+  "skills": ["./skills/"],
+  "mcpServers": ["./.mcp.json"]
+}

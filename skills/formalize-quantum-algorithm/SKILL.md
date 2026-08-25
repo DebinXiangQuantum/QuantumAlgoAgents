@@ -22,6 +22,7 @@ proof backend, or resource backend. Use its capability boundaries as hard constr
   SQIR/VOQC/Coq, qRHL, or another suitable external backend.
 - Use Qualtran for compositional algorithm representation and resource analysis, not formal proof.
 - Treat OpenQASM and QIR as low-level interchange/execution formats, not correctness certificates.
+- Treat qmd-prover as a protected obligation graph plus optional independent AI review, not a formal proof checker.
 - Label material claims `source_supported`, `model_inference`, `uncertain`, or
   `needs_human_check`; attach primary or official URLs to `source_supported` claims.
 
@@ -89,7 +90,20 @@ proof backend, or resource backend. Use its capability boundaries as hard constr
    - If a backend or adapter is unavailable, return an explicit handoff plan; do not synthesize a
      successful proof result.
 
-9. Optionally evaluate declared expressions at explicit points.
+9. Optionally export a qmd-prover review project.
+   - Initialize a dedicated empty target with `qmd-prover init`, then run:
+
+     ```bash
+     python3 scripts/qad_cli.py export-qmd candidate.qadl.json --project qmd-handoff
+     ```
+
+   - Use `--proofs proofs.json` only for proof text explicitly supplied or developed for the exact
+     obligation. Every proof that uses the imported candidate must cite `{{qadl-contract}}` at the
+     load-bearing use.
+   - The exporter represents the QADL candidate as an `.assumed` definition. Preserve the resulting
+     assumption footprint and never promote a qmd-prover AI verdict to `formally-verified`.
+
+10. Optionally evaluate declared expressions at explicit points.
    - Prefer MCP tool `qadl_analyze_resources`, or run:
 
      ```bash
@@ -107,7 +121,9 @@ Return or create, as requested:
 2. The validation report, including unresolved warnings.
 3. The rendered formal contract with its non-proof disclaimer intact.
 4. A backend routing table with obligation ID, target, expected artifact, assumptions, and status.
-5. An unresolved-items list using provenance labels.
+5. When requested, a qmd-prover handoff manifest with candidate hash, obligation mapping, and
+   `machine_checked: false`.
+6. An unresolved-items list using provenance labels.
 
 Do not silently change the problem, access model, output contract, baseline, or claim while fixing
 formalization errors.

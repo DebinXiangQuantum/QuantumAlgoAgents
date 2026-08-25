@@ -7,7 +7,14 @@ import json
 import sys
 from typing import Any, Callable
 
-from qadlib import analyze_resources, audit_advantage, render_formal_contract, search_candidates, validate_candidate
+from qadlib import (
+    analyze_resources,
+    audit_advantage,
+    render_formal_contract,
+    render_qmd_handoff,
+    search_candidates,
+    validate_candidate,
+)
 
 
 SERVER_INFO = {"name": "quantum-algorithm-designer", "version": "0.1.1"}
@@ -53,6 +60,17 @@ TOOLS = [
         "inputSchema": object_schema({"candidate": {"type": "object"}}, ["candidate"]),
     },
     {
+        "name": "qadl_render_qmd_handoff",
+        "description": "Render QADL proof obligations as protected qmd-prover goals without claiming formal verification.",
+        "inputSchema": object_schema(
+            {
+                "candidate": {"type": "object"},
+                "proofs": {"type": "object", "additionalProperties": {"type": "object"}},
+            },
+            ["candidate"],
+        ),
+    },
+    {
         "name": "qadl_search_candidates",
         "description": "Run bounded random or evolutionary search and return a Pareto archive without certifying correctness.",
         "inputSchema": object_schema(
@@ -85,6 +103,10 @@ def _formalize(arguments: dict[str, Any]) -> Any:
     return {"document": render_formal_contract(arguments["candidate"]), "machine_checked": False}
 
 
+def _qmd_handoff(arguments: dict[str, Any]) -> Any:
+    return render_qmd_handoff(arguments["candidate"], arguments.get("proofs"))
+
+
 def _search(arguments: dict[str, Any]) -> Any:
     budget = min(int(arguments.get("budget", 64)), 500)
     return search_candidates(
@@ -101,6 +123,7 @@ HANDLERS: dict[str, Callable[[dict[str, Any]], Any]] = {
     "qadl_analyze_resources": _analyze,
     "qadl_audit_advantage": _audit,
     "qadl_render_formal_contract": _formalize,
+    "qadl_render_qmd_handoff": _qmd_handoff,
     "qadl_search_candidates": _search,
 }
 

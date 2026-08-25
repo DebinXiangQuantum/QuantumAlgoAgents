@@ -59,6 +59,9 @@ claim ladder.
    - Type-check and parse source artifacts.
    - Compare tractable instances with an independent reference, including edge and failure cases.
    - Use simulation or testing to find counterexamples. Record this layer as `tested`, not proved.
+   - A qmd-prover handoff may protect statements, check citation wiring, and obtain independent AI
+     review. Record that result as review/test evidence with its assumption footprint; it does not
+     reach machine-checked V3.
 
 5. Route formal correctness obligations.
    - Use Qbricks/Why3 for supported parametric circuit-building contracts and symbolic
@@ -69,6 +72,8 @@ claim ladder.
    - Use qRHL/qrhl-tool for relational, equivalence-style, and security properties of two programs.
    - Use Silq/SilVer only for the safety or behavioral fragment those tools actually cover.
    - Treat any unverified translation between QADL and a backend as a trusted assumption.
+   - Never map qmd-prover `verified` directly to QADL `formally-verified`; require a proof-assistant
+     artifact for that status.
 
 6. Verify resource claims at the appropriate level.
    - Prove query bounds from named oracle-call recurrences and amplification/failure assumptions.

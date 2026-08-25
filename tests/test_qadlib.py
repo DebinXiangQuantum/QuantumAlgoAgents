@@ -8,6 +8,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 
@@ -15,7 +16,15 @@ PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = PLUGIN_ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from qadlib import analyze_resources, audit_advantage, render_formal_contract, search_candidates, validate_candidate  # noqa: E402
+from qadlib import (  # noqa: E402
+    analyze_resources,
+    audit_advantage,
+    render_formal_contract,
+    render_qmd_handoff,
+    search_candidates,
+    validate_candidate,
+    write_qmd_handoff,
+)
 from qadlib.expressions import ExpressionError, evaluate_expression  # noqa: E402
 
 
@@ -130,6 +139,67 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(all(not item["feasible"] for item in report["archive"]))
 
 
+class QmdHandoffTests(unittest.TestCase):
+    def test_qadl_status_does_not_create_a_qmd_proof(self):
+        candidate = load_example("grover-oracle-search.qadl.json")
+        rendered = render_qmd_handoff(candidate)
+        document = rendered["document"]
+        self.assertFalse(rendered["machine_checked"])
+        self.assertEqual(document.count(".theorem .goal"), len(candidate["proof_obligations"]))
+        self.assertNotIn("{.proof", document)
+        self.assertIn("Source QADL status: `proof-sketch`", document)
+        self.assertIn("All black-box predicates with exactly one marked input", document)
+        self.assertIn("success probability is `2 / 3`", document)
+        self.assertIn("`randomized-black-box-scan` uses access `black-box-oracle`", document)
+        self.assertIn("Its declared error budget is:", document)
+        self.assertIn("Its resource-model assumptions are:", document)
+        self.assertTrue(all(not item["proof_supplied"] for item in rendered["manifest"]["obligations"]))
+
+    def test_explicit_proof_sidecar_maps_qadl_dependencies(self):
+        candidate = load_example("grover-oracle-search.qadl.json")
+        rendered = render_qmd_handoff(
+            candidate,
+            {
+                "po-resource": {
+                    "text": "Under {{qadl-contract}}, counting the stated iterations gives the declared query expression.",
+                    "draft": True,
+                },
+                "po-advantage": {
+                    "text": "Under {{qadl-contract}} and by {{po-resource}}, the quantum upper bound has the claimed order.",
+                },
+            },
+        )
+        resource_id = next(
+            item["qmd_id"] for item in rendered["manifest"]["obligations"] if item["qadl_id"] == "po-resource"
+        )
+        self.assertIn(f"@{resource_id}", rendered["document"])
+        self.assertIn(f'@{rendered["manifest"]["qadl_contract_qmd_id"]}', rendered["document"])
+        self.assertIn(".proof .draft", rendered["document"])
+        self.assertNotIn("{{po-resource}}", rendered["document"])
+
+    def test_handoff_refuses_to_replace_changed_protected_statements(self):
+        candidate = load_example("grover-oracle-search.qadl.json")
+        with TemporaryDirectory() as temporary:
+            project = Path(temporary)
+            (project / ".qmd-prover").mkdir()
+            (project / "AGENTS.md").write_text(
+                "<!-- qmd-prover-contract:start version=28 -->\n<!-- qmd-prover-contract:end -->\n",
+                encoding="utf-8",
+            )
+            (project / ".qmd-prover" / "config.yml").write_text("verification:\n  backend: none\n", encoding="utf-8")
+            (project / "_quarto.yml").write_text("book:\n  title: test\n  chapters: []\n", encoding="utf-8")
+            first = write_qmd_handoff(candidate, project)
+            self.assertTrue(first["exported"])
+            self.assertEqual(first["quarto_chapter"], "added")
+            self.assertTrue((project / "index.qmd").is_file())
+            self.assertIn("index.qmd", (project / "_quarto.yml").read_text(encoding="utf-8"))
+
+            changed = copy.deepcopy(candidate)
+            changed["proof_obligations"][0]["statement"] += " Changed."
+            with self.assertRaisesRegex(ValueError, "protected qmd statements"):
+                write_qmd_handoff(changed, project)
+
+
 class McpTests(unittest.TestCase):
     def test_stdio_server_lists_tools(self):
         messages = "\n".join(
@@ -149,6 +219,7 @@ class McpTests(unittest.TestCase):
         responses = [json.loads(line) for line in completed.stdout.splitlines()]
         names = {item["name"] for item in responses[1]["result"]["tools"]}
         self.assertIn("qadl_validate_candidate", names)
+        self.assertIn("qadl_render_qmd_handoff", names)
         self.assertIn("qadl_search_candidates", names)
 
     def test_manifest_version_and_brand_assets_are_consistent(self):

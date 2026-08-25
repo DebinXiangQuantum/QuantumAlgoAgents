@@ -56,7 +56,8 @@ QADL obligations may be routed to:
 - Qbricks/Why3 for supported parametric circuit-building proofs;
 - SQIR/VOQC for Coq circuit semantics and verified transformations;
 - qRHL-style relational reasoning where supported;
+- qmd-prover for protected proof-obligation graphs and independent AI review, explicitly not formal verification;
 - Qualtran or dedicated estimators for executable resource decompositions;
 - OpenQASM or QIR after algorithm-level obligations remain linked.
 
-These are routing targets, not current built-in integrations. Unsupported obligations remain open.
+The qmd-prover renderer/exporter is built in as a review handoff; the other entries remain routing targets rather than built-in proof integrations. Unsupported obligations remain open, and no qmd-prover verdict automatically changes a QADL status.

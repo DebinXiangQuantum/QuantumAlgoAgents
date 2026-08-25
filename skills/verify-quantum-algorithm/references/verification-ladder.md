@@ -65,6 +65,7 @@ does not open, authenticate, or check that artifact. Human/backend verification 
 | Algorithm call graph/resource table | Qualtran | Experimental analysis, not machine-checked correctness |
 | Concrete FT physical cost | Microsoft QRE | Conditional model estimate, not asymptotic proof or advantage |
 | Executable low-level program | OpenQASM/QIR | Representation is not a correctness certificate |
+| Protected obligation graph and independent AI review | qmd-prover | Mechanical consistency and AI acceptance are not machine-checked functional correctness; preserve every `.assumed` footprint |
 
 The exact identifier `QCVerifier` is `uncertain` absent a canonical citation or repository. Exact
 searches found no canonical record as of 2026-07-18. Ask for the source rather than silently mapping
@@ -145,6 +146,7 @@ implementation-correspondence obligation. It does not give end-to-end V3 for the
 ## 6. Downgrade Rules
 
 - QADL validation or rendered Markdown only: cap at V0.
+- qmd-prover mechanical checks plus independent AI review: retain as review evidence and cap below V3 unless a separate machine-checked artifact covers the exact obligation.
 - Simulator/reference tests only: cap at V1.
 - Type safety only: cap at V2 for that safety property.
 - Paper theorem with mismatched promises, oracle, output, or implementation: mark `uncertain` or

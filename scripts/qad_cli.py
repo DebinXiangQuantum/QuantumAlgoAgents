@@ -9,7 +9,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from qadlib import analyze_resources, audit_advantage, render_formal_contract, search_candidates, validate_candidate
+from qadlib import (
+    analyze_resources,
+    audit_advantage,
+    render_formal_contract,
+    search_candidates,
+    validate_candidate,
+    write_qmd_handoff,
+)
 
 
 def load_json(path: str) -> Any:
@@ -45,6 +52,12 @@ def build_parser() -> argparse.ArgumentParser:
     formalize.add_argument("candidate")
     formalize.add_argument("--out")
 
+    export_qmd = subparsers.add_parser("export-qmd", help="export proof obligations to an initialized qmd-prover project")
+    export_qmd.add_argument("candidate")
+    export_qmd.add_argument("--project", required=True, help="directory previously initialized with qmd-prover init")
+    export_qmd.add_argument("--proofs", help="optional JSON proof sidecar keyed by QADL obligation id")
+    export_qmd.add_argument("--out")
+
     search = subparsers.add_parser("search", help="run random or evolutionary search")
     search.add_argument("search_space")
     search.add_argument("--method", choices=("random", "evolutionary"), default="evolutionary")
@@ -75,6 +88,11 @@ def main() -> int:
             return 0 if result["blocker_count"] == 0 else 2
         if args.command == "formalize":
             write_output(render_formal_contract(load_json(args.candidate)), args.out, as_text=True)
+            return 0
+        if args.command == "export-qmd":
+            proofs = load_json(args.proofs) if args.proofs else None
+            result = write_qmd_handoff(load_json(args.candidate), args.project, proofs)
+            write_output(result, args.out)
             return 0
         if args.command == "search":
             result = search_candidates(

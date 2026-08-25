@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Add a guarded QADL-to-qmd-prover handoff for protected proof obligations, explicit proof sidecars, and CLI/MCP export.
+- Add reproducible hybrid-chemistry and bounded arithmetic-search validation packets with evidence-gated advantage claims.
+- Add an A100-executed noiseless molecular active-space benchmark with retained energy/error curves, failure points, and artifact hashes.
+
 ### Fixed
 
 - Configure explicit pip cache dependency paths for GitHub Actions.

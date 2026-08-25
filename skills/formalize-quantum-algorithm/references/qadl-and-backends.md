@@ -61,6 +61,7 @@ sound type/effect derivation under stated assumptions.
 | QWIRE / Coq | Linear wire typing, superoperator denotation, circuit well-formedness, and selected circuit proofs | General classical control, automatic large-scale proof, or physical cost | External Coq development |
 | qRHL / qrhl-tool | Relations between two interactive quantum programs, equivalence-style and quantum/post-quantum security arguments | Single-program gate optimization or general physical resource estimation | External Isabelle-backed interactive prover |
 | Quantum Hoare logic | Partial/total correctness, weakest preconditions, and quantitative predicates at the semantic level | Automatic proof by itself | Theory; choose a mechanized implementation before claiming formal verification |
+| qmd-prover | Protect QADL obligation statements, build citation-derived dependency graphs, run mechanical checks, and optionally obtain independent AI review | Formal verification, proof-assistant certificates, asymptotic derivation, or automatic QADL status promotion | Implemented review handoff; imported QADL contract remains an explicit assumption |
 | Silq | High-level typing and safe automatic uncomputation in its supported language | User postconditions, asymptotic bounds, or general theorem proving | Type checker/interpreter; SilVer is a separate SMT prototype |
 | Proto-Quipper-R / QuRA | Type/effect-derived symbolic upper bounds for width, gate/T count, depth/T-depth, qubits, and bits | Functional correctness of the quantum algorithm or physical FT cost | External active tool; emit its solver trace and source |
 | Qualtran | Composable algorithm blocks, call graphs, architecture-independent resource tables, simulations, and downstream cost models | Machine-checked functional correctness or a complexity lower bound | Experimental resource-analysis library |
@@ -114,11 +115,14 @@ Run commands from the plugin root.
 | --- | --- | --- | --- |
 | Validate | `python3 scripts/qad_cli.py validate CANDIDATE` | `qadl_validate_candidate` | Schema, expressions, DAG, cross-field, and proof-artifact presence checks only |
 | Render | `python3 scripts/qad_cli.py formalize CANDIDATE` | `qadl_render_formal_contract` | Generates a non-machine-checked document |
+| qmd review handoff | `python3 scripts/qad_cli.py export-qmd CANDIDATE --project DIR` | `qadl_render_qmd_handoff` | Protected goals plus optional AI review; always `machine_checked: false` and conditional on the imported QADL contract |
 | Sample resources | `python3 scripts/qad_cli.py analyze CANDIDATE --points POINTS` | `qadl_analyze_resources` | Numeric evaluation at explicit points, not asymptotic proof |
 | Audit advantage | `python3 scripts/qad_cli.py audit CANDIDATE` | `qadl_audit_advantage` | Evidence gate; never automatic certification |
 
 The plugin currently does not invoke Qbricks, Coq, Isabelle, QuRA, Qualtran, QRE, OpenQASM, or QIR
-backends. Treat those as external handoffs until an adapter is implemented and validated.
+backends. Treat those as external handoffs until an adapter is implemented and validated. The
+qmd-prover exporter is implemented, but qmd-prover's mechanical and independent-AI layers remain
+review evidence rather than machine proof.
 
 ## 6. Evidence Basis
 

@@ -57,6 +57,7 @@ The loop is deliberately reversible. A failed proof obligation or audit returns 
 | `validate` returns `valid: true` | Full JSON Schema validation and implemented cross-field consistency checks passed. | Semantic correctness or truth of proof artifacts. |
 | `analyze` returns numeric values | Declared resource expressions evaluated at supplied parameter points. | An asymptotic bound or scaling theorem. |
 | `formalize` returns a document | A reviewable problem interface, stage contracts, and proof-obligation scaffold. | A machine-checked proof. |
+| `export-qmd` creates a handoff | QADL obligations are protected qmd-prover goals with stable provenance and an explicit imported-contract assumption. | Lean/Coq-style formal verification or automatic QADL status promotion. |
 | Search returns a Pareto archive | Candidates are feasible and nondominated under the declared evaluator. | Correctness, novelty, generalization, or advantage. |
 | `audit` has no blockers | The implemented evidence gates passed. | Automatic certification or a peer-reviewed scientific conclusion. |
 
@@ -96,6 +97,26 @@ python3 scripts/qad_cli.py audit \
 
 The example contains a conditional query-level claim. Passing its audit does not convert the oracle assumption into an end-to-end speedup.
 
+### Optional qmd-prover handoff
+
+Install `qmd-prover` and Pandoc separately, initialize a dedicated proof project, and export the QADL obligations:
+
+```bash
+mkdir qmd-handoff
+cd qmd-handoff
+qmd-prover init
+cd ..
+
+python3 scripts/qad_cli.py export-qmd \
+  assets/examples/grover-oracle-search.qadl.json \
+  --project qmd-handoff
+
+cd qmd-handoff
+qmd-prover inspect project
+```
+
+Without an explicit `--proofs` JSON sidecar, every exported obligation remains `open`. A sidecar proof must cite `{{qadl-contract}}` where it uses the imported candidate contract. qmd-prover can then apply mechanical graph checks and an optional independent AI verifier. Any accepted result remains conditional on the reported assumption footprint and is not a formal proof certificate.
+
 ### Search a finite design space
 
 ```bash
@@ -131,7 +152,7 @@ python3 scripts/train_sb3.py \
 | `validate` | `0` | `1` | `2` |
 | `analyze` | `0` | `1` for evaluation errors | `2` |
 | `audit` | `0` when no blockers remain | `2` | `2` |
-| `formalize`, `search` | `0` | Not applicable | `2` |
+| `formalize`, `export-qmd`, `search` | `0` | Not applicable | `2` |
 
 An `audit` exit code of `0` means only that the implemented gates passed.
 
@@ -139,15 +160,16 @@ An `audit` exit code of `0` means only that the implemented gates passed.
 
 The plugin registers an SDK-free stdio server through `.mcp.json`. Full validation still requires `jsonschema`; validation fails closed when it is unavailable.
 
-The server exposes five tools:
+The server exposes six tools:
 
 - `qadl_validate_candidate`
 - `qadl_analyze_resources`
 - `qadl_audit_advantage`
 - `qadl_render_formal_contract`
+- `qadl_render_qmd_handoff`
 - `qadl_search_candidates`
 
-The formal renderer always returns `machine_checked: false`. MCP search accepts random or evolutionary search, caps a requested budget at 500, and then caps it again at the finite search-space size. Optional PPO training is a separate script, not an MCP tool.
+Both formal renderers return `machine_checked: false`. The qmd handoff renderer is pure and returns source plus provenance; the CLI writes it into a project already initialized by qmd-prover. MCP search accepts random or evolutionary search, caps a requested budget at 500, and then caps it again at the finite search-space size. Optional PPO training is a separate script, not an MCP tool.
 
 The canonical source repository is [DebinXiangQuantum/QuantumAlgoAgents](https://github.com/DebinXiangQuantum/QuantumAlgoAgents). Public Codex marketplace distribution is a separate release channel; cloning the repository is sufficient for the CLI, schemas, examples, and development workflow documented here.
 
@@ -176,6 +198,7 @@ assets/schemas/                QADL and search-space JSON Schemas
 assets/examples/               Executable contract/search examples
 assets/brand/                  Editable marks and rendered plugin icons
 scripts/qadlib/                Deterministic validation/search/audit core
+scripts/qadlib/qmd.py          qmd-prover proof-obligation handoff
 scripts/qad_cli.py             Command-line interface
 scripts/mcp_server.py          MCP server
 scripts/train_sb3.py           Optional PPO/MaskablePPO search

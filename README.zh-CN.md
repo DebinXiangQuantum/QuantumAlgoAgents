@@ -57,6 +57,7 @@ flowchart LR
 | `validate` 返回 `valid: true` | 完整 JSON Schema 与已实现的跨字段一致性检查通过。 | 语义正确性或证明工件内容为真。 |
 | `analyze` 返回数值 | 在指定参数点求值声明的资源表达式。 | 渐近界或扩展性定理。 |
 | `formalize` 返回文档 | 生成可审查的问题接口、阶段合同和证明义务框架。 | 机器检查证明。 |
+| `export-qmd` 创建 handoff | 将 QADL 义务映射为受保护的 qmd-prover 目标，并保留 provenance 与显式导入合同假设。 | Lean/Coq 式形式证明或自动提升 QADL 状态。 |
 | 搜索返回 Pareto 档案 | 在声明的评估器下候选可行且非支配。 | 正确性、新颖性、泛化或优势。 |
 | `audit` 没有 blocker | 已实现的证据门通过。 | 自动认证或同行评审结论。 |
 
@@ -96,6 +97,26 @@ python3 scripts/qad_cli.py audit \
 
 示例中的结论是有条件的查询级声明。审计通过并不会把 oracle 假设转换成端到端加速。
 
+### 可选 qmd-prover 接入
+
+另行安装 `qmd-prover` 与 Pandoc，初始化专用证明项目，再导出 QADL 义务：
+
+```bash
+mkdir qmd-handoff
+cd qmd-handoff
+qmd-prover init
+cd ..
+
+python3 scripts/qad_cli.py export-qmd \
+  assets/examples/grover-oracle-search.qadl.json \
+  --project qmd-handoff
+
+cd qmd-handoff
+qmd-prover inspect project
+```
+
+未显式提供 `--proofs` JSON sidecar 时，所有义务都保持 `open`。sidecar 中的证明在使用导入候选合同时必须引用 `{{qadl-contract}}`。随后 qmd-prover 可执行机械依赖图检查和可选的独立 AI 核验；即使核验接受，结论也仍带有报告中的 assumption footprint，不能称为形式证明证书。
+
 ### 搜索有限设计空间
 
 ```bash
@@ -131,7 +152,7 @@ python3 scripts/train_sb3.py \
 | `validate` | `0` | `1` | `2` |
 | `analyze` | `0` | 存在求值错误时为 `1` | `2` |
 | `audit` | 无 blocker 时为 `0` | `2` | `2` |
-| `formalize`、`search` | `0` | 不适用 | `2` |
+| `formalize`、`export-qmd`、`search` | `0` | 不适用 | `2` |
 
 `audit` 返回 `0` 仅表示已实现的门控条件通过。
 
@@ -139,15 +160,16 @@ python3 scripts/train_sb3.py \
 
 插件通过 `.mcp.json` 注册不依赖 MCP SDK 的 stdio 服务。完整验证仍然依赖 `jsonschema`，该依赖缺失时验证会 fail-closed。
 
-服务暴露五个工具：
+服务暴露六个工具：
 
 - `qadl_validate_candidate`
 - `qadl_analyze_resources`
 - `qadl_audit_advantage`
 - `qadl_render_formal_contract`
+- `qadl_render_qmd_handoff`
 - `qadl_search_candidates`
 
-形式化渲染器始终返回 `machine_checked: false`。MCP 搜索只支持 random/evolutionary，请求预算上限为 500，随后还会被有限空间大小进一步限制。PPO 训练是独立脚本，不属于 MCP 工具。
+两个形式化渲染器都返回 `machine_checked: false`。qmd handoff MCP 工具只返回源码与 provenance，CLI 负责写入已由 qmd-prover 初始化的项目。MCP 搜索只支持 random/evolutionary，请求预算上限为 500，随后还会被有限空间大小进一步限制。PPO 训练是独立脚本，不属于 MCP 工具。
 
 规范源码仓库为 [DebinXiangQuantum/QuantumAlgoAgents](https://github.com/DebinXiangQuantum/QuantumAlgoAgents)。公开 Codex marketplace 属于独立发布渠道；克隆该仓库即可使用这里记录的 CLI、schema、示例和开发流程。
 
@@ -176,6 +198,7 @@ assets/schemas/                QADL 与搜索空间 JSON Schema
 assets/examples/               可执行合同与搜索示例
 assets/brand/                  可编辑图标源文件与插件图标
 scripts/qadlib/                确定性验证、搜索与审计核心
+scripts/qadlib/qmd.py          qmd-prover 证明义务 handoff
 scripts/qad_cli.py             命令行接口
 scripts/mcp_server.py          MCP 服务
 scripts/train_sb3.py           可选 PPO/MaskablePPO 搜索

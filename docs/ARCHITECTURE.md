@@ -41,6 +41,7 @@ The eight directories under `skills/` define the reasoning workflow exposed to C
 - `validation.py`: JSON Schema and cross-field validation;
 - `audit.py`: resource sampling and advantage-claim gates;
 - `formal.py`: a reviewable Z-style and quantum Hoare proof scaffold;
+- `qmd.py`: a deterministic QADL-to-qmd-prover handoff with protected goals, hashes, and an explicit imported-contract assumption;
 - `search.py`: finite genome materialization, deterministic evaluation, and Pareto archiving;
 - `environment.py`: an optional Gymnasium environment over the same evaluator.
 
@@ -52,7 +53,7 @@ Random and evolutionary search are deterministic under a fixed search space, eva
 
 ### Interface layer
 
-`scripts/qad_cli.py` exposes validation, numeric analysis, formal rendering, audit, and random/evolutionary search. `scripts/mcp_server.py` exposes the same deterministic operations through stdio JSON-RPC without an MCP SDK dependency. Full schema validation requires `jsonschema` and fails closed when it is unavailable.
+`scripts/qad_cli.py` exposes validation, numeric analysis, formal rendering, qmd-prover export, audit, and random/evolutionary search. `scripts/mcp_server.py` exposes pure deterministic rendering and evaluation operations through stdio JSON-RPC without an MCP SDK dependency. Full schema validation requires `jsonschema` and fails closed when it is unavailable.
 
 ### External backend boundary
 
@@ -62,6 +63,8 @@ Qbricks/Why3, SQIR/VOQC, qRHL, Qualtran, OpenQASM, QIR, hardware compilers, and 
 2. a semantics-preservation argument or machine-checked translation is supplied.
 
 An external artifact may close a proof obligation only when the obligation identifies that artifact and its review status is explicit.
+
+qmd-prover is an implemented review handoff, not a formal proof backend. The exporter maps each obligation to a protected semantic-QMD goal, imports the QADL candidate as an explicit `.assumed` definition, and records hashes without changing QADL statuses. Mechanical qmd checks and optional independent AI verdicts remain review evidence; accepted results report the imported-contract assumption footprint and cannot justify `formally-verified` by themselves.
 
 ## Core invariants
 
